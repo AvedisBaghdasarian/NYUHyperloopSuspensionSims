@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
+
 plateheight = .0127 #m
 platelength = 3.81 #m
 flatheight = .00102 #m
@@ -13,11 +14,11 @@ flatlength = .363 #m
 gaplength  = 0.003175 #m
 fulltrack = 1264.92 #m
 
-trackratio = 50/166 #first 100 plates are considered, this is enough
+trackratio = 100/332 #first 100 plates are considered, this is enough
 tracklength = trackratio * fulltrack
 
 samples = 21*16600 #samples of track,must be high enough that gaplength is accounted for. I prefer at least 3 samples to a gaplength
-dx = tracklength / samples
+dx = tracklength / (samples-1)
 print(dx)
 track = np.zeros(samples)
 
@@ -38,22 +39,26 @@ profile[profilesamples:2*profilesamples] = np.linspace(flatheight, 0, profilesam
 
 track[:] = track[:] + profile[(np.array(range(samples))%(2*profilesamples))]
 
+##gaps
 gapsamples = int(np.round(gaplength/dx))
 print(gapsamples)
 if gapsamples%2 == 0:
     a = gapsamples/2
     for i in  range(int(trackratio*166)):
         for j in range(gapsamples):
-            track[int(i*platesamples-a+j)] = 0
+            track[int(i*platesamples-a+j)] = track[int(i*platesamples-a+j)]-.00003
 
 else:
     a = (gapsamples-1)/2
     for i in  range(int(trackratio*332)):
         for j in range(gapsamples):
             b = (i*platesamples-a+j)
-            track[int(b)] = 0
+            track[int(b)] = track[int(b)]-.00003
+np.save("track", track)
 
-
+trackmeta = np.zeros(4)
+trackmeta[:] = dx, trackratio*332, tracklength, profilesamples #dx, number of plates, lenght of track considered, flatness samples
+np.save("trackmeta", trackmeta)
 fig, ax = plt.subplots()
 # for k in range(zetapoints):
 #     ax.set(xlabel='omega/omega_0', ylabel='acceleration (m/s/s)',
@@ -61,4 +66,5 @@ fig, ax = plt.subplots()
 #     ax.plot(x, acc[k,:])
 ax.plot(track)
 
-# plt.show()
+
+plt.show()
