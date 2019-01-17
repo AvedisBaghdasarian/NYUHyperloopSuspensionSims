@@ -1,3 +1,8 @@
+##this code is an extremely dirty verification of the estimates of pod oscillations,and is not intended to be any form of formal calculation
+
+##additionally, poor documentation and technique are consistant through this document. Please refer to springestimate.py for clearer results.
+
+
 import os
 import numpy as np
 import matplotlib as mpl
@@ -32,9 +37,9 @@ I2 = m * (1.5)**2
 
 fig, ax = plt.subplots()
 zetapoints = 1
-zeta = np.linspace(0.25, .25, zetapoints)
+zeta = np.linspace(1, 1, zetapoints)
 npoints = 500
-npoints2 = 40
+npoints2 = 20
 #theta function of k
 ycom = np.zeros([zetapoints, npoints])
 acom = np.zeros([zetapoints, npoints])
@@ -42,13 +47,14 @@ theta = np.zeros([zetapoints, npoints])
 alphatheta = np.zeros([zetapoints, npoints])
 theta2 = np.zeros([zetapoints, npoints])
 alphatheta2 = np.zeros([zetapoints, npoints])
-ki = np.linspace(0, 100000, npoints2)
+ki = np.linspace(0, 50000, npoints2)
 vi = np.linspace(.1, vmax, npoints)
 w = kappa*vi #1/s
 for j in range(zetapoints):
     for i in range(npoints2):
         k = ki[i]
         w_0 = a*np.sqrt(2*ki[i]/m)
+
         c = zeta[j]*a*I*w_0
         # Ftheta = 2*a*A*np.sin(kappa*L)*np.sqrt(k**2+(c*w)**2)
         Ftheta = 2*a*A*1*np.sqrt(k**2+(c*w)**2)
@@ -60,10 +66,12 @@ for j in range(zetapoints):
 
 
     for i in range(npoints2):
-        k = 2*ki[i]
+
+        k = ki[i]
         print(k)
         w_0 = np.sqrt(2*k/m)
         c = zeta[j]*m*w_0
+        wratio = w/w_0
         # Fcom = 2*A*np.cos(kappa*L)*np.sqrt(k**2+(c*w)**2)
         Fcom = 2*A*1*np.sqrt(k**2+(c*w)**2)
         Zcom = np.sqrt((2*w_0*zeta[j])**2 + 1/w**2 * (w_0**2-w**2)**2) #N
@@ -71,7 +79,8 @@ for j in range(zetapoints):
         acomw = ycomw * w * w #amplitude of accel as a function of w
         ycom[j, i] = np.amax(ycomw) #max response for any w
         acom[j, i] = np.amax(acomw) #max accel for any w
-        ax.plot(ycomw)
+
+
     for i in range(npoints2):
         k = ki[i]
         w_0 = a*np.sqrt(2*ki[i]/I2)
@@ -92,10 +101,10 @@ accY2 = acctheta+acccom
 DY2 = ytheta+ycom
 
 
-
+ax.plot(wratio, ycomw)
 # for k in range(zetapoints):
-#     ax.set(xlabel='omega/omega_0', ylabel='acceleration (m/s/s)',
-#            title='accel vs angular number')
+ax.set(xlabel='w/w_0', ylabel='Response, m',
+           title='Estimate Height of single suspension points vs Frequency For Varius K')
     # ax.plot(y[k, :])
     # ax.plot(ki, ycom[k, :])
 plt.show()
